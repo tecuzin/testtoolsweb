@@ -1,5 +1,5 @@
 import { FormBuilder } from '@angular/forms';
-import { createEnvironmentInjector, runInInjectionContext } from '@angular/core';
+import { Injector, runInInjectionContext } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -30,14 +30,16 @@ describe('ParcelDetailComponent (UI mockee)', () => {
     apiMock.createPlanting.mockReturnValue(of(detailsFixture.plantings[0]));
     apiMock.createTreatment.mockReturnValue(of(detailsFixture.treatments[0]));
 
-    const injector = createEnvironmentInjector([
-      FormBuilder,
-      { provide: ApiService, useValue: apiMock },
-      {
-        provide: ActivatedRoute,
-        useValue: { snapshot: { paramMap: { get: () => '1' } } }
-      }
-    ]);
+    const injector = Injector.create({
+      providers: [
+        FormBuilder,
+        { provide: ApiService, useValue: apiMock },
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: { get: () => '1' } } }
+        }
+      ]
+    });
 
     const component = runInInjectionContext(injector, () => new ParcelDetailComponent());
     component.ngOnInit();
@@ -47,7 +49,6 @@ describe('ParcelDetailComponent (UI mockee)', () => {
     expect(component.details()?.plantings).toHaveLength(1);
     expect(component.details()?.treatments).toHaveLength(1);
     expect(component.plantingForm.getRawValue().areaHectares).toBe(5.5);
-    injector.destroy();
   });
 
   it('soumet un traitement avec plantingId derive des details', () => {
@@ -55,14 +56,16 @@ describe('ParcelDetailComponent (UI mockee)', () => {
     apiMock.createPlanting.mockReturnValue(of(detailsFixture.plantings[0]));
     apiMock.createTreatment.mockReturnValue(of(detailsFixture.treatments[0]));
 
-    const injector = createEnvironmentInjector([
-      FormBuilder,
-      { provide: ApiService, useValue: apiMock },
-      {
-        provide: ActivatedRoute,
-        useValue: { snapshot: { paramMap: { get: () => '1' } } }
-      }
-    ]);
+    const injector = Injector.create({
+      providers: [
+        FormBuilder,
+        { provide: ApiService, useValue: apiMock },
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: { get: () => '1' } } }
+        }
+      ]
+    });
 
     const component = runInInjectionContext(injector, () => new ParcelDetailComponent());
     component.ngOnInit();
@@ -84,7 +87,6 @@ describe('ParcelDetailComponent (UI mockee)', () => {
       dose: '1.5L/ha',
       notes: null
     });
-    injector.destroy();
   });
 
   it('soumet une plantation avec parcelId courant', () => {
@@ -92,14 +94,16 @@ describe('ParcelDetailComponent (UI mockee)', () => {
     apiMock.createPlanting.mockReturnValue(of(detailsFixture.plantings[0]));
     apiMock.createTreatment.mockReturnValue(of(detailsFixture.treatments[0]));
 
-    const injector = createEnvironmentInjector([
-      FormBuilder,
-      { provide: ApiService, useValue: apiMock },
-      {
-        provide: ActivatedRoute,
-        useValue: { snapshot: { paramMap: { get: () => '1' } } }
-      }
-    ]);
+    const injector = Injector.create({
+      providers: [
+        FormBuilder,
+        { provide: ApiService, useValue: apiMock },
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: { get: () => '1' } } }
+        }
+      ]
+    });
 
     const component = runInInjectionContext(injector, () => new ParcelDetailComponent());
     component.ngOnInit();
@@ -118,6 +122,5 @@ describe('ParcelDetailComponent (UI mockee)', () => {
       areaHectares: 1.2
     });
     expect(component.activeForm()).toBe(null);
-    injector.destroy();
   });
 });
