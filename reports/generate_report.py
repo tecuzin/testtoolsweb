@@ -33,6 +33,56 @@ def coverage_payload(summary: Optional[dict[str, Any]]) -> dict[str, Any]:
   }
 
 
+def component_coverage_payload(summary: Optional[dict[str, Any]]) -> dict[str, Any]:
+  if not summary:
+    return {
+      "available": False,
+      "files": {"total": 0, "covered": 0},
+      "statements": {"pct": 0.0, "covered": 0, "total": 0}
+    }
+
+  component_entries = []
+  for key, value in summary.items():
+    if key == "total":
+      continue
+    if isinstance(key, str) and key.endswith(".component.ts"):
+      component_entries.append(value)
+
+  if not component_entries:
+    return {
+      "available": False,
+      "files": {"total": 0, "covered": 0},
+      "statements": {"pct": 0.0, "covered": 0, "total": 0}
+    }
+
+  total_statements = 0
+  covered_statements = 0
+  covered_files = 0
+  for entry in component_entries:
+    statements = entry.get("statements", {})
+    total = int(statements.get("total", 0))
+    covered = int(statements.get("covered", 0))
+    total_statements += total
+    covered_statements += covered
+    if covered > 0:
+      covered_files += 1
+
+  pct = (
+    (covered_statements / total_statements) * 100.0
+    if total_statements
+    else 0.0
+  )
+  return {
+    "available": True,
+    "files": {"total": len(component_entries), "covered": covered_files},
+    "statements": {
+      "pct": round(pct, 2),
+      "covered": covered_statements,
+      "total": total_statements
+    }
+  }
+
+
 def parse_e2e(cucumber_report: Any) -> dict[str, Any]:
   if not cucumber_report:
     return {
@@ -130,12 +180,12 @@ def parse_perf(k6_summary: Optional[dict[str, Any]]) -> dict[str, Any]:
 
 
 def main() -> None:
+  frontend_summary = load_json(REPORTS_DIR / "frontend" / "coverage-summary.json")
   backend_cov = coverage_payload(
     load_json(REPORTS_DIR / "backend" / "coverage-summary.json")
   )
-  frontend_cov = coverage_payload(
-    load_json(REPORTS_DIR / "frontend" / "coverage-summary.json")
-  )
+  frontend_cov = coverage_payload(frontend_summary)
+  frontend_component_cov = component_coverage_payload(frontend_summary)
 
   backend_total = backend_cov["statements"]["total"]
   frontend_total = frontend_cov["statements"]["total"]
@@ -157,6 +207,7 @@ def main() -> None:
     "coverage": {
       "backend": backend_cov,
       "frontend": frontend_cov,
+      "frontendComponents": frontend_component_cov,
       "consolidated": {
         "available": consolidated_total > 0,
         "statements": {

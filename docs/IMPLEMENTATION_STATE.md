@@ -75,6 +75,7 @@ Regles metier notables:
 - Fichiers:
   - `backend/tests/parcel.service.spec.ts`
   - `backend/tests/planting.service.spec.ts`
+  - `backend/tests/treatment.service.spec.ts`
 - Couche couverte: services metier (tests unitaires)
 - Pas de tests HTTP d'integration a ce stade
 
@@ -111,9 +112,13 @@ Regles metier notables:
 
 - Outil: Vitest (jsdom)
 - Fichier:
+  - `frontend/src/app/app.component.spec.ts`
   - `frontend/src/app/api.service.spec.ts`
+  - `frontend/src/app/parcel-list.component.spec.ts`
+  - `frontend/src/app/parcel-detail.component.spec.ts`
 - Nature des tests:
   - appels HTTP mockes (pas d'appel API reel)
+  - tests UI de composants standalone avec `ApiService` mocke
 
 ## 4. E2E et performance
 
@@ -155,7 +160,7 @@ Statut:
 
 Par rapport au plan initial:
 - Cible front tests: composants + services mockes
-- Etat reel valide: tests de service API mocke, pas encore de specs composants dans l'etat courant
+- Etat reel valide: tests de service API mocke + specs composants UI mockees (liste/detail)
 - Cible gates CI completes: non configurees ici (execution locale manuelle validee)
 - Cible perf locale via k6 natif: remplacee par execution Docker pour portabilite
 

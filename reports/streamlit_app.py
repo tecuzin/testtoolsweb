@@ -33,6 +33,9 @@ if not report:
 coverage = report.get("coverage", {})
 backend = coverage.get("backend", {}).get("statements", {})
 frontend = coverage.get("frontend", {}).get("statements", {})
+frontend_components = coverage.get("frontendComponents", {})
+frontend_components_statements = frontend_components.get("statements", {})
+frontend_components_files = frontend_components.get("files", {})
 consolidated = coverage.get("consolidated", {}).get("statements", {})
 e2e = report.get("e2e", {})
 perf = report.get("perf", {})
@@ -83,6 +86,40 @@ progress_cols[1].progress(
 )
 progress_cols[2].progress(
   ratio(float(consolidated.get("pct", 0))), text="Consolidee"
+)
+
+st.subheader("Composants Angular")
+components_col1, components_col2, components_col3 = st.columns(3)
+components_col1.metric(
+  "Couverture composants",
+  f"{float(frontend_components_statements.get('pct', 0)):.2f}%"
+)
+components_col2.metric(
+  "Fichiers composants couverts",
+  f"{int(frontend_components_files.get('covered', 0))}/{int(frontend_components_files.get('total', 0))}"
+)
+components_col3.metric(
+  "Statements composants",
+  f"{int(frontend_components_statements.get('covered', 0))}/{int(frontend_components_statements.get('total', 0))}"
+)
+
+components_chart_df = pd.DataFrame(
+  {
+    "metric": ["Composants Angular"],
+    "covered_statements": [int(frontend_components_statements.get("covered", 0))],
+    "uncovered_statements": [
+      max(
+        int(frontend_components_statements.get("total", 0))
+        - int(frontend_components_statements.get("covered", 0)),
+        0
+      )
+    ],
+  }
+).set_index("metric")
+st.bar_chart(components_chart_df)
+st.progress(
+  ratio(float(frontend_components_statements.get("pct", 0))),
+  text="Progression couverture composants Angular"
 )
 
 st.divider()

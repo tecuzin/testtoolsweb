@@ -1,28 +1,40 @@
 {
-  "generatedAt": "2026-03-08T16:33:01.861660+00:00",
+  "generatedAt": "2026-03-08T16:44:56.999227+00:00",
   "coverage": {
     "backend": {
       "available": true,
       "statements": {
-        "pct": 47.36,
-        "covered": 36,
-        "total": 76
+        "pct": 52.94,
+        "covered": 54,
+        "total": 102
       }
     },
     "frontend": {
       "available": true,
       "statements": {
-        "pct": 10.1,
-        "covered": 19,
+        "pct": 78.72,
+        "covered": 148,
         "total": 188
+      }
+    },
+    "frontendComponents": {
+      "available": true,
+      "files": {
+        "total": 3,
+        "covered": 3
+      },
+      "statements": {
+        "pct": 91.49,
+        "covered": 129,
+        "total": 141
       }
     },
     "consolidated": {
       "available": true,
       "statements": {
-        "pct": 20.83,
-        "covered": 55,
-        "total": 264
+        "pct": 69.66,
+        "covered": 202,
+        "total": 290
       }
     }
   },
@@ -51,7 +63,7 @@
       }
     },
     "checks": {
-      "passes": 1693,
+      "passes": 1696,
       "fails": 0,
       "passRate": 100.0
     }

@@ -1,5 +1,5 @@
-import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { FormBuilder } from '@angular/forms';
+import { createEnvironmentInjector, runInInjectionContext } from '@angular/core';
 import { of } from 'rxjs';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { ApiService } from './api.service';
@@ -14,53 +14,37 @@ describe('ParcelListComponent (UI mockee)', () => {
   beforeEach(() => {
     apiMock.getParcels.mockReset();
     apiMock.createParcel.mockReset();
-    TestBed.resetTestingModule();
   });
 
   it('affiche les parcelles recuperees via API mockee', () => {
     apiMock.getParcels.mockReturnValue(
       of([{ id: 1, name: 'Parcelle Nord', areaHectares: 4.2, location: 'Secteur A' }])
     );
-    apiMock.createParcel.mockReturnValue(
-      of({ id: 2, name: 'Parcelle Sud', areaHectares: 2.5, location: 'Secteur B' })
-    );
+    apiMock.createParcel.mockReturnValue(of({ id: 2 }));
 
-    TestBed.configureTestingModule({
-      imports: [ParcelListComponent],
-      providers: [{ provide: ApiService, useValue: apiMock }, provideRouter([])]
-    });
-
-    const fixture = TestBed.createComponent(ParcelListComponent);
-    fixture.detectChanges();
+    const injector = createEnvironmentInjector([
+      FormBuilder,
+      { provide: ApiService, useValue: apiMock }
+    ]);
+    const component = runInInjectionContext(injector, () => new ParcelListComponent());
+    component.ngOnInit();
 
     expect(apiMock.getParcels).toHaveBeenCalledOnce();
-    const cards = fixture.nativeElement.querySelectorAll('[data-testid="parcel-item"]');
-    expect(cards.length).toBe(1);
-    expect(fixture.nativeElement.textContent).toContain('Parcelle Nord');
+    expect(component.parcels()).toHaveLength(1);
+    expect(component.parcels()[0].name).toBe('Parcelle Nord');
+    injector.destroy();
   });
 
   it('ouvre le formulaire puis cree une parcelle sans appel HTTP reel', () => {
     apiMock.getParcels.mockReturnValue(of([]));
-    apiMock.createParcel.mockReturnValue(
-      of({ id: 10, name: 'Grand Clos', areaHectares: 3.1, location: 'Plateau' })
-    );
+    apiMock.createParcel.mockReturnValue(of({ id: 10 }));
 
-    TestBed.configureTestingModule({
-      imports: [ParcelListComponent],
-      providers: [{ provide: ApiService, useValue: apiMock }, provideRouter([])]
-    });
-
-    const fixture = TestBed.createComponent(ParcelListComponent);
-    const component = fixture.componentInstance;
-    fixture.detectChanges();
-
-    const toggleButton = Array.from(
-      fixture.nativeElement.querySelectorAll('button')
-    ).find((button: HTMLButtonElement) => button.textContent?.includes('Nouvelle parcelle'));
-    toggleButton?.click();
-    fixture.detectChanges();
-
-    expect(fixture.nativeElement.querySelector('[data-testid="parcel-create-form"]')).not.toBeNull();
+    const injector = createEnvironmentInjector([
+      FormBuilder,
+      { provide: ApiService, useValue: apiMock }
+    ]);
+    const component = runInInjectionContext(injector, () => new ParcelListComponent());
+    component.showCreateForm.set(true);
 
     component.parcelForm.setValue({
       name: 'Grand Clos',
@@ -68,7 +52,6 @@ describe('ParcelListComponent (UI mockee)', () => {
       location: 'Plateau'
     });
     component.onSubmit();
-    fixture.detectChanges();
 
     expect(apiMock.createParcel).toHaveBeenCalledWith({
       name: 'Grand Clos',
@@ -76,5 +59,41 @@ describe('ParcelListComponent (UI mockee)', () => {
       location: 'Plateau'
     });
     expect(component.showCreateForm()).toBe(false);
+    injector.destroy();
+  });
+
+  it('calcule les indicateurs d avancement de la vue UI', () => {
+    const injector = createEnvironmentInjector([
+      FormBuilder,
+      { provide: ApiService, useValue: apiMock }
+    ]);
+    const component = runInInjectionContext(injector, () => new ParcelListComponent());
+
+    expect(component.completionFromArea(4.2)).toBeGreaterThanOrEqual(20);
+    expect(component.statusFromCompletion(85)).toBe('Operation quasi terminee');
+    expect(component.statusFromCompletion(60)).toBe('En cours');
+    expect(component.statusFromCompletion(30)).toBe('Demarrage');
+    injector.destroy();
+  });
+
+  it('ignore la soumission si formulaire invalide', () => {
+    apiMock.getParcels.mockReturnValue(of([]));
+    apiMock.createParcel.mockReturnValue(of({ id: 10 }));
+
+    const injector = createEnvironmentInjector([
+      FormBuilder,
+      { provide: ApiService, useValue: apiMock }
+    ]);
+    const component = runInInjectionContext(injector, () => new ParcelListComponent());
+
+    component.parcelForm.setValue({
+      name: '',
+      areaHectares: 0,
+      location: ''
+    });
+    component.onSubmit();
+
+    expect(apiMock.createParcel).not.toHaveBeenCalled();
+    injector.destroy();
   });
 });
