@@ -17,7 +17,7 @@ import { ParcelDetails } from './models';
   imports: [CommonModule, ReactiveFormsModule, RouterLink, DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="container" *ngIf="details() as data">
+    <div class="container pb-4" *ngIf="details() as data">
       <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb mb-0">
           <li class="breadcrumb-item"><a routerLink="/" class="text-decoration-none">Parcelles</a></li>
@@ -25,7 +25,7 @@ import { ParcelDetails } from './models';
         </ol>
       </nav>
 
-      <section class="hero-card mb-4">
+      <section class="hero-card mb-3">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
           <div>
             <h1 class="h2 mb-1 text-success-emphasis" data-testid="parcel-title">{{ data.parcel.name }}</h1>
@@ -38,6 +38,33 @@ import { ParcelDetails } from './models';
             <button (click)="openForm('treatment')" class="btn btn-success">
               + Traitement
             </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="row g-3 mb-3">
+        <div class="col-12 col-md-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <p class="small text-secondary mb-1">Surface</p>
+              <p class="h4 mb-0 text-success-emphasis">{{ data.parcel.areaHectares }} ha</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <p class="small text-secondary mb-1">Plantations</p>
+              <p class="h4 mb-0 text-success-emphasis">{{ data.plantings.length }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <p class="small text-secondary mb-1">Traitements</p>
+              <p class="h4 mb-0 text-success-emphasis">{{ data.treatments.length }}</p>
+            </div>
           </div>
         </div>
       </section>
@@ -110,7 +137,7 @@ import { ParcelDetails } from './models';
                     <p class="mb-0 fw-semibold text-dark">{{ pl.cropType }}</p>
                     <small class="text-secondary">{{ pl.plantedAt | date: 'dd/MM/yyyy' }}</small>
                   </div>
-                  <span class="badge text-bg-success-subtle text-success-emphasis border">{{ pl.areaHectares }} ha</span>
+                  <span class="badge rounded-pill text-bg-success-subtle text-success-emphasis border">{{ pl.areaHectares }} ha</span>
                 </li>
               </ul>
               <p class="text-secondary mb-0" *ngIf="data.plantings.length === 0">Aucune culture saisie pour le moment.</p>
@@ -133,7 +160,7 @@ import { ParcelDetails } from './models';
                       <p class="mb-0 fw-semibold text-dark">{{ tr.treatmentType }}</p>
                       <small class="text-secondary">{{ tr.appliedAt | date: 'dd/MM/yyyy' }}</small>
                     </div>
-                    <span class="badge text-bg-primary-subtle text-primary-emphasis border">{{ tr.dose }}</span>
+                    <span class="badge rounded-pill text-bg-success-subtle text-success-emphasis border">{{ tr.dose }}</span>
                   </div>
                 </li>
               </ul>
