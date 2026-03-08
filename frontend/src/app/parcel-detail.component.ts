@@ -1,5 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  inject,
+  signal
+} from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from './api.service';
@@ -8,101 +14,135 @@ import { ParcelDetails } from './models';
 @Component({
   standalone: true,
   selector: 'app-parcel-detail',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, DatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section class="card" *ngIf="details">
-      <div class="section-top">
-        <h2 data-testid="parcel-title">{{ details.parcel.name }}</h2>
-        <span class="kpi">Etape 2</span>
+    <div class="container" *ngIf="details() as data">
+      <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a routerLink="/" class="text-decoration-none">Parcelles</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ data.parcel.name }}</li>
+        </ol>
+      </nav>
+
+      <section class="hero-card mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+          <div>
+            <h1 class="h2 mb-1 text-success-emphasis" data-testid="parcel-title">{{ data.parcel.name }}</h1>
+            <p class="mb-0 text-secondary">{{ data.parcel.location }} - {{ data.parcel.areaHectares }} ha</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button (click)="openForm('planting')" class="btn btn-outline-success">
+              + Plantation
+            </button>
+            <button (click)="openForm('treatment')" class="btn btn-success">
+              + Traitement
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card border-0 shadow-sm mb-3" *ngIf="activeForm() === 'planting'">
+        <div class="card-body p-4">
+          <h3 class="h5 mb-3">Nouveau semis</h3>
+          <form [formGroup]="plantingForm" (ngSubmit)="submitPlanting()" data-testid="planting-create-form">
+            <div class="row g-3">
+              <div class="col-12 col-md-4">
+                <input formControlName="cropType" data-testid="planting-crop-input" placeholder="Culture" class="form-control">
+              </div>
+              <div class="col-12 col-md-4">
+                <input type="date" formControlName="plantedAt" data-testid="planting-date-input" class="form-control">
+              </div>
+              <div class="col-12 col-md-4">
+                <input type="number" formControlName="areaHectares" data-testid="planting-area-input" placeholder="Surface (ha)" class="form-control">
+              </div>
+              <div class="col-12 d-flex justify-content-end gap-2">
+                <button type="button" (click)="activeForm.set(null)" class="btn btn-outline-secondary">Annuler</button>
+                <button type="submit" data-testid="planting-submit-btn" class="btn btn-success">
+                  Confirmer
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="card border-0 shadow-sm mb-3" *ngIf="activeForm() === 'treatment'">
+        <div class="card-body p-4">
+          <h3 class="h5 mb-3">Nouveau traitement</h3>
+          <form [formGroup]="treatmentForm" (ngSubmit)="submitTreatment()" data-testid="treatment-create-form">
+            <div class="row g-3">
+              <div class="col-12 col-md-3">
+                <input formControlName="treatmentType" data-testid="treatment-type-input" placeholder="Type" class="form-control">
+              </div>
+              <div class="col-12 col-md-3">
+                <input type="date" formControlName="appliedAt" data-testid="treatment-date-input" class="form-control">
+              </div>
+              <div class="col-12 col-md-3">
+                <input formControlName="dose" data-testid="treatment-dose-input" placeholder="Dose" class="form-control">
+              </div>
+              <div class="col-12 col-md-3">
+                <input formControlName="notes" data-testid="treatment-notes-input" placeholder="Notes" class="form-control">
+              </div>
+              <div class="col-12 d-flex justify-content-end gap-2">
+                <button type="button" (click)="activeForm.set(null)" class="btn btn-outline-secondary">Annuler</button>
+                <button type="submit" data-testid="treatment-submit-btn" class="btn btn-success">
+                  Confirmer
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <div class="row g-3 g-lg-4">
+        <section class="col-12 col-lg-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <h2 class="h4 mb-3 text-success-emphasis">Cultures</h2>
+              <ul class="list-group list-group-flush" *ngIf="data.plantings.length > 0">
+                <li
+                  *ngFor="let pl of data.plantings; trackBy: trackByPlantingId"
+                  class="list-group-item d-flex justify-content-between align-items-center px-0"
+                  data-testid="planting-item"
+                >
+                  <div>
+                    <p class="mb-0 fw-semibold text-dark">{{ pl.cropType }}</p>
+                    <small class="text-secondary">{{ pl.plantedAt | date: 'dd/MM/yyyy' }}</small>
+                  </div>
+                  <span class="badge text-bg-success-subtle text-success-emphasis border">{{ pl.areaHectares }} ha</span>
+                </li>
+              </ul>
+              <p class="text-secondary mb-0" *ngIf="data.plantings.length === 0">Aucune culture saisie pour le moment.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="col-12 col-lg-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <h2 class="h4 mb-3 text-success-emphasis">Traitements</h2>
+              <ul class="list-group list-group-flush" *ngIf="data.treatments.length > 0">
+                <li
+                  *ngFor="let tr of data.treatments; trackBy: trackByTreatmentId"
+                  class="list-group-item px-0"
+                  data-testid="treatment-item"
+                >
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                      <p class="mb-0 fw-semibold text-dark">{{ tr.treatmentType }}</p>
+                      <small class="text-secondary">{{ tr.appliedAt | date: 'dd/MM/yyyy' }}</small>
+                    </div>
+                    <span class="badge text-bg-primary-subtle text-primary-emphasis border">{{ tr.dose }}</span>
+                  </div>
+                </li>
+              </ul>
+              <p class="text-secondary mb-0" *ngIf="data.treatments.length === 0">Aucun traitement saisi pour le moment.</p>
+            </div>
+          </div>
+        </section>
       </div>
-      <p class="muted">Surface: {{ details.parcel.areaHectares }} ha</p>
-      <p class="muted">Localisation: {{ details.parcel.location }}</p>
-      <a class="nav-link" routerLink="/">Retour a la liste</a>
-    </section>
-
-    <section class="grid-2" *ngIf="details">
-      <article class="card">
-        <div class="section-top">
-          <h3>Ajouter une plantation</h3>
-          <span class="kpi">{{ details.plantings.length }} enregistree(s)</span>
-        </div>
-        <p class="muted">Renseignez la culture semee et la surface concernee.</p>
-        <form [formGroup]="plantingForm" (ngSubmit)="addPlanting()" data-testid="planting-create-form">
-          <div class="form-group">
-            <label for="crop">Culture</label>
-            <input id="crop" formControlName="cropType" data-testid="planting-crop-input" />
-            <small class="help-text">Exemple: Ble tendre, Mais grain...</small>
-          </div>
-
-          <div class="form-group">
-            <label for="plantedAt">Date de semis</label>
-            <input id="plantedAt" type="date" formControlName="plantedAt" data-testid="planting-date-input" />
-          </div>
-
-          <div class="form-group">
-            <label for="plantingArea">Surface (ha)</label>
-            <input id="plantingArea" type="number" formControlName="areaHectares" data-testid="planting-area-input" />
-          </div>
-
-          <div class="button-row">
-            <button type="submit" [disabled]="plantingForm.invalid" data-testid="planting-submit-btn">Ajouter</button>
-          </div>
-        </form>
-
-        <p class="empty-state" *ngIf="details.plantings.length === 0">
-          Aucune plantation enregistree.
-        </p>
-
-        <ul class="list-clean" *ngIf="details.plantings.length > 0">
-          <li class="list-item" *ngFor="let planting of details.plantings" data-testid="planting-item">
-            {{ planting.cropType }} - {{ planting.areaHectares }} ha
-          </li>
-        </ul>
-      </article>
-
-      <article class="card">
-        <div class="section-top">
-          <h3>Ajouter un traitement</h3>
-          <span class="kpi">{{ details.treatments.length }} enregistre(s)</span>
-        </div>
-        <p class="muted">Suivez les interventions appliquees a la parcelle.</p>
-        <form [formGroup]="treatmentForm" (ngSubmit)="addTreatment()" data-testid="treatment-create-form">
-          <div class="form-group">
-            <label for="type">Type de traitement</label>
-            <input id="type" formControlName="treatmentType" data-testid="treatment-type-input" />
-          </div>
-
-          <div class="form-group">
-            <label for="appliedAt">Date d'application</label>
-            <input id="appliedAt" type="date" formControlName="appliedAt" data-testid="treatment-date-input" />
-          </div>
-
-          <div class="form-group">
-            <label for="dose">Dose</label>
-            <input id="dose" formControlName="dose" data-testid="treatment-dose-input" />
-          </div>
-
-          <div class="form-group">
-            <label for="notes">Notes</label>
-            <input id="notes" formControlName="notes" data-testid="treatment-notes-input" />
-          </div>
-
-          <div class="button-row">
-            <button type="submit" [disabled]="treatmentForm.invalid" data-testid="treatment-submit-btn">Ajouter</button>
-          </div>
-        </form>
-
-        <p class="empty-state" *ngIf="details.treatments.length === 0">
-          Aucun traitement enregistre.
-        </p>
-
-        <ul class="list-clean" *ngIf="details.treatments.length > 0">
-          <li class="list-item" *ngFor="let treatment of details.treatments" data-testid="treatment-item">
-            {{ treatment.treatmentType }} - {{ treatment.dose }}
-          </li>
-        </ul>
-      </article>
-    </section>
+    </div>
   `
 })
 export class ParcelDetailComponent implements OnInit {
@@ -110,71 +150,85 @@ export class ParcelDetailComponent implements OnInit {
   private readonly api = inject(ApiService);
   private readonly fb = inject(FormBuilder);
 
-  details: ParcelDetails | null = null;
-  parcelId = 0;
+  readonly details = signal<ParcelDetails | null>(null);
+  readonly activeForm = signal<'planting' | 'treatment' | null>(null);
 
   readonly plantingForm = this.fb.nonNullable.group({
-    cropType: ['', [Validators.required, Validators.minLength(2)]],
-    plantedAt: ['', Validators.required],
+    cropType: ['', [Validators.required]],
+    plantedAt: [new Date().toISOString().split('T')[0], Validators.required],
     areaHectares: [0, [Validators.required, Validators.min(0.1)]]
   });
 
   readonly treatmentForm = this.fb.nonNullable.group({
-    treatmentType: ['', [Validators.required, Validators.minLength(2)]],
-    appliedAt: ['', Validators.required],
-    dose: ['', [Validators.required, Validators.minLength(2)]],
+    treatmentType: ['', [Validators.required]],
+    appliedAt: [new Date().toISOString().split('T')[0], Validators.required],
+    dose: ['', [Validators.required]],
     notes: ['']
   });
 
   ngOnInit(): void {
-    this.parcelId = Number(this.route.snapshot.paramMap.get('id'));
-    this.refresh();
+    this.loadDetails();
   }
 
-  refresh(): void {
-    this.api.getParcelDetails(this.parcelId).subscribe((details) => {
-      this.details = details;
+  loadDetails(): void {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    if (Number.isNaN(id)) {
+      return;
+    }
+
+    this.api.getParcel(id).subscribe((details) => {
+      this.details.set(details);
+      this.plantingForm.patchValue({ areaHectares: details.parcel.areaHectares });
     });
   }
 
-  addPlanting(): void {
-    if (this.plantingForm.invalid || !this.details) {
+  openForm(type: 'planting' | 'treatment'): void {
+    this.activeForm.set(type);
+  }
+
+  submitPlanting(): void {
+    const details = this.details();
+    if (this.plantingForm.invalid || !details) {
       return;
     }
 
     this.api
       .createPlanting({
-        parcelId: this.details.parcel.id,
+        parcelId: details.parcel.id,
         ...this.plantingForm.getRawValue()
       })
       .subscribe(() => {
-        this.plantingForm.reset({ cropType: '', plantedAt: '', areaHectares: 0 });
-        this.refresh();
+        this.loadDetails();
+        this.activeForm.set(null);
       });
   }
 
-  addTreatment(): void {
-    if (this.treatmentForm.invalid || !this.details) {
+  submitTreatment(): void {
+    const details = this.details();
+    if (this.treatmentForm.invalid || !details) {
       return;
     }
 
     this.api
       .createTreatment({
-        parcelId: this.details.parcel.id,
-        plantingId: null,
+        parcelId: details.parcel.id,
+        plantingId: details.plantings[0]?.id ?? null,
         treatmentType: this.treatmentForm.getRawValue().treatmentType,
         appliedAt: this.treatmentForm.getRawValue().appliedAt,
         dose: this.treatmentForm.getRawValue().dose,
         notes: this.treatmentForm.getRawValue().notes || null
       })
       .subscribe(() => {
-        this.treatmentForm.reset({
-          treatmentType: '',
-          appliedAt: '',
-          dose: '',
-          notes: ''
-        });
-        this.refresh();
+        this.loadDetails();
+        this.activeForm.set(null);
       });
+  }
+
+  trackByPlantingId(_index: number, item: NonNullable<ParcelDetails['plantings'][number]>): number {
+    return item.id;
+  }
+
+  trackByTreatmentId(_index: number, item: NonNullable<ParcelDetails['treatments'][number]>): number {
+    return item.id;
   }
 }

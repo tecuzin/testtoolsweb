@@ -6,19 +6,17 @@ import { RouterLink, RouterOutlet } from '@angular/router';
   standalone: true,
   imports: [RouterOutlet, RouterLink],
   template: `
-    <div class="min-h-screen bg-app text-gray-900 font-sans antialiased">
-      <nav class="bg-white border-b border-gray-100 sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <a class="flex items-center gap-2 cursor-pointer text-decoration-none" routerLink="/">
-            <div class="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-bold">
-              A
-            </div>
-            <span class="font-bold text-xl tracking-tight text-emerald-900">AgriTrack</span>
+    <div class="app-shell">
+      <nav class="navbar navbar-expand bg-white shadow-sm border-bottom sticky-top">
+        <div class="container py-1">
+          <a class="navbar-brand d-flex align-items-center gap-2 fw-bold text-success-emphasis" routerLink="/">
+            <span class="brand-badge">A</span>
+            <span>AgriTrack</span>
           </a>
         </div>
       </nav>
 
-      <main class="py-8">
+      <main class="py-4 py-md-5">
         <router-outlet></router-outlet>
       </main>
     </div>
