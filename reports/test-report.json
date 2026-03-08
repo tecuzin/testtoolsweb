@@ -1,0 +1,59 @@
+{
+  "generatedAt": "2026-03-08T16:33:01.861660+00:00",
+  "coverage": {
+    "backend": {
+      "available": true,
+      "statements": {
+        "pct": 47.36,
+        "covered": 36,
+        "total": 76
+      }
+    },
+    "frontend": {
+      "available": true,
+      "statements": {
+        "pct": 10.1,
+        "covered": 19,
+        "total": 188
+      }
+    },
+    "consolidated": {
+      "available": true,
+      "statements": {
+        "pct": 20.83,
+        "covered": 55,
+        "total": 264
+      }
+    }
+  },
+  "e2e": {
+    "available": true,
+    "scenarios": {
+      "total": 2,
+      "passed": 2,
+      "failed": 0
+    },
+    "steps": {
+      "total": 15,
+      "passed": 15,
+      "failed": 0
+    }
+  },
+  "perf": {
+    "available": true,
+    "thresholds": {
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "details": {
+        "http_req_failed<0.02": true,
+        "http_req_duration_p95<500": true
+      }
+    },
+    "checks": {
+      "passes": 1693,
+      "fails": 0,
+      "passRate": 100.0
+    }
+  }
+}

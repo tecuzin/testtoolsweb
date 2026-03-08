@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "test": "cucumber-js",
-    "test:headed": "PWDEBUG=1 cucumber-js"
+    "test:headed": "PWDEBUG=1 cucumber-js",
+    "test:report": "cucumber-js --format progress --format summary --format json:../../reports/e2e/cucumber-report.json"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^11.0.1",

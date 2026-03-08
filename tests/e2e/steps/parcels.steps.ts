@@ -26,6 +26,10 @@ When("j'ouvre l'application", async function (this: UiWorld) {
 When(
   'je cree une parcelle {string} de {float} ha a {string}',
   async function (this: UiWorld, name: string, area: number, location: string) {
+    const openCreate = this.page.getByRole('button', { name: /Nouvelle parcelle|Ajouter une parcelle/i });
+    if (await openCreate.isVisible()) {
+      await openCreate.click();
+    }
     await this.page.getByTestId('parcel-name-input').fill(name);
     await this.page.getByTestId('parcel-area-input').fill(String(area));
     await this.page.getByTestId('parcel-location-input').fill(location);
@@ -44,6 +48,7 @@ When('je vais sur la parcelle {string}', async function (this: UiWorld, name: st
 When(
   'j\'ajoute une plantation {string} du {string} sur {float} ha',
   async function (this: UiWorld, crop: string, date: string, area: number) {
+    await this.page.getByRole('button', { name: /\+ Plantation/i }).click();
     await this.page.getByTestId('planting-crop-input').fill(crop);
     await this.page.getByTestId('planting-date-input').fill(date);
     await this.page.getByTestId('planting-area-input').fill(String(area));
@@ -59,6 +64,7 @@ When(
     date: string,
     dose: string
   ) {
+    await this.page.getByRole('button', { name: /\+ Traitement/i }).click();
     await this.page.getByTestId('treatment-type-input').fill(treatmentType);
     await this.page.getByTestId('treatment-date-input').fill(date);
     await this.page.getByTestId('treatment-dose-input').fill(dose);
