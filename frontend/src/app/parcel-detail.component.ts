@@ -11,55 +11,93 @@ import { ParcelDetails } from './models';
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
     <section class="card" *ngIf="details">
-      <h2 data-testid="parcel-title">{{ details.parcel.name }}</h2>
-      <p>Surface: {{ details.parcel.areaHectares }} ha</p>
-      <p>Localisation: {{ details.parcel.location }}</p>
-      <a routerLink="/">Retour</a>
+      <div class="section-top">
+        <h2 data-testid="parcel-title">{{ details.parcel.name }}</h2>
+        <span class="kpi">Etape 2</span>
+      </div>
+      <p class="muted">Surface: {{ details.parcel.areaHectares }} ha</p>
+      <p class="muted">Localisation: {{ details.parcel.location }}</p>
+      <a class="nav-link" routerLink="/">Retour a la liste</a>
     </section>
 
     <section class="grid-2" *ngIf="details">
       <article class="card">
-        <h3>Ajouter une plantation</h3>
+        <div class="section-top">
+          <h3>Ajouter une plantation</h3>
+          <span class="kpi">{{ details.plantings.length }} enregistree(s)</span>
+        </div>
+        <p class="muted">Renseignez la culture semee et la surface concernee.</p>
         <form [formGroup]="plantingForm" (ngSubmit)="addPlanting()" data-testid="planting-create-form">
-          <label for="crop">Culture</label>
-          <input id="crop" formControlName="cropType" data-testid="planting-crop-input" />
+          <div class="form-group">
+            <label for="crop">Culture</label>
+            <input id="crop" formControlName="cropType" data-testid="planting-crop-input" />
+            <small class="help-text">Exemple: Ble tendre, Mais grain...</small>
+          </div>
 
-          <label for="plantedAt">Date de semis</label>
-          <input id="plantedAt" type="date" formControlName="plantedAt" data-testid="planting-date-input" />
+          <div class="form-group">
+            <label for="plantedAt">Date de semis</label>
+            <input id="plantedAt" type="date" formControlName="plantedAt" data-testid="planting-date-input" />
+          </div>
 
-          <label for="plantingArea">Surface (ha)</label>
-          <input id="plantingArea" type="number" formControlName="areaHectares" data-testid="planting-area-input" />
+          <div class="form-group">
+            <label for="plantingArea">Surface (ha)</label>
+            <input id="plantingArea" type="number" formControlName="areaHectares" data-testid="planting-area-input" />
+          </div>
 
-          <button type="submit" [disabled]="plantingForm.invalid" data-testid="planting-submit-btn">Ajouter</button>
+          <div class="button-row">
+            <button type="submit" [disabled]="plantingForm.invalid" data-testid="planting-submit-btn">Ajouter</button>
+          </div>
         </form>
 
-        <ul>
-          <li *ngFor="let planting of details.plantings" data-testid="planting-item">
+        <p class="empty-state" *ngIf="details.plantings.length === 0">
+          Aucune plantation enregistree.
+        </p>
+
+        <ul class="list-clean" *ngIf="details.plantings.length > 0">
+          <li class="list-item" *ngFor="let planting of details.plantings" data-testid="planting-item">
             {{ planting.cropType }} - {{ planting.areaHectares }} ha
           </li>
         </ul>
       </article>
 
       <article class="card">
-        <h3>Ajouter un traitement</h3>
+        <div class="section-top">
+          <h3>Ajouter un traitement</h3>
+          <span class="kpi">{{ details.treatments.length }} enregistre(s)</span>
+        </div>
+        <p class="muted">Suivez les interventions appliquees a la parcelle.</p>
         <form [formGroup]="treatmentForm" (ngSubmit)="addTreatment()" data-testid="treatment-create-form">
-          <label for="type">Type</label>
-          <input id="type" formControlName="treatmentType" data-testid="treatment-type-input" />
+          <div class="form-group">
+            <label for="type">Type de traitement</label>
+            <input id="type" formControlName="treatmentType" data-testid="treatment-type-input" />
+          </div>
 
-          <label for="appliedAt">Date</label>
-          <input id="appliedAt" type="date" formControlName="appliedAt" data-testid="treatment-date-input" />
+          <div class="form-group">
+            <label for="appliedAt">Date d'application</label>
+            <input id="appliedAt" type="date" formControlName="appliedAt" data-testid="treatment-date-input" />
+          </div>
 
-          <label for="dose">Dose</label>
-          <input id="dose" formControlName="dose" data-testid="treatment-dose-input" />
+          <div class="form-group">
+            <label for="dose">Dose</label>
+            <input id="dose" formControlName="dose" data-testid="treatment-dose-input" />
+          </div>
 
-          <label for="notes">Notes</label>
-          <input id="notes" formControlName="notes" data-testid="treatment-notes-input" />
+          <div class="form-group">
+            <label for="notes">Notes</label>
+            <input id="notes" formControlName="notes" data-testid="treatment-notes-input" />
+          </div>
 
-          <button type="submit" [disabled]="treatmentForm.invalid" data-testid="treatment-submit-btn">Ajouter</button>
+          <div class="button-row">
+            <button type="submit" [disabled]="treatmentForm.invalid" data-testid="treatment-submit-btn">Ajouter</button>
+          </div>
         </form>
 
-        <ul>
-          <li *ngFor="let treatment of details.treatments" data-testid="treatment-item">
+        <p class="empty-state" *ngIf="details.treatments.length === 0">
+          Aucun traitement enregistre.
+        </p>
+
+        <ul class="list-clean" *ngIf="details.treatments.length > 0">
+          <li class="list-item" *ngFor="let treatment of details.treatments" data-testid="treatment-item">
             {{ treatment.treatmentType }} - {{ treatment.dose }}
           </li>
         </ul>

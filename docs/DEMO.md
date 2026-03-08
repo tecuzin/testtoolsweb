@@ -21,7 +21,8 @@ Montrer la complementarite des outils de tests sur une application web Angular +
    - Message cle: zero dependance API/backend
 
 4. **E2E BDD reelle avec Cucumber + Playwright (3-4 min)**
-   - Lancer stack: `docker compose up --build`
+   - Lancer stack: `docker compose up --build -d`
+   - Installer Chromium (si besoin local): `npx playwright install chromium`
    - Lancer E2E: `npm run test:e2e`
    - Montrer feature Gherkin + resultat execution
    - Message cle: verification bout-en-bout sur stack reelle
@@ -29,7 +30,7 @@ Montrer la complementarite des outils de tests sur une application web Angular +
 5. **Performance API avec k6 (2 min)**
    - Lancer: `npm run test:perf`
    - Lire p95, erreurs et throughput
-   - Message cle: controle de la tenue en charge
+   - Message cle: controle de la tenue en charge (k6 execute en conteneur Docker)
 
 ## Messages clefs a faire passer
 

@@ -1,5 +1,10 @@
 # Agri Testtools Demo
 
+[![CI](https://github.com/tecuzin/testtoolsweb/actions/workflows/ci.yml/badge.svg)](https://github.com/tecuzin/testtoolsweb/actions/workflows/ci.yml)
+[![Performance Nightly](https://github.com/tecuzin/testtoolsweb/actions/workflows/perf-nightly.yml/badge.svg)](https://github.com/tecuzin/testtoolsweb/actions/workflows/perf-nightly.yml)
+[![Last Commit](https://img.shields.io/github/last-commit/tecuzin/testtoolsweb)](https://github.com/tecuzin/testtoolsweb/commits/main)
+[![Repo Size](https://img.shields.io/github/repo-size/tecuzin/testtoolsweb)](https://github.com/tecuzin/testtoolsweb)
+
 Mini-application de gestion de parcelles agricoles conçue pour demontrer une strategie de tests complete:
 
 - **Frontend**: Angular (TypeScript)
@@ -30,7 +35,8 @@ Mini-application de gestion de parcelles agricoles conçue pour demontrer une st
 
 - Docker + Docker Compose
 - Node.js 22+ (uniquement si execution hors Docker)
-- k6 (uniquement si execution perf hors Docker)
+- Playwright Chromium pour E2E locaux:
+  - `npx playwright install chromium`
 
 ## Demarrage rapide (Docker)
 
@@ -111,6 +117,8 @@ Prerequis: backend actif.
 ```bash
 npm run test:perf
 ```
+
+`test:perf` utilise un conteneur `grafana/k6` (pas de binaire k6 local requis).
 
 ## Variables d'environnement
 

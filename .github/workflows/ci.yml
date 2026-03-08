@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: ['**']
+    branches: ['main', 'develop']
   pull_request:
-    branches: ['**']
+    branches: ['main', 'develop']
   workflow_dispatch:
 
 jobs:
@@ -41,6 +41,17 @@ jobs:
 
       - name: Run E2E stack in Docker
         run: docker compose --profile tests up --build --abort-on-container-exit --exit-code-from e2e e2e
+
+      - name: Collect Docker logs
+        if: always()
+        run: docker compose logs --no-color > e2e-docker.log
+
+      - name: Upload E2E Docker logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-docker-logs
+          path: e2e-docker.log
 
       - name: Shutdown Docker stack
         if: always()

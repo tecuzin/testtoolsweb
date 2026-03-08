@@ -1,15 +1,17 @@
 # Etat d'implementation detaille
 
-Ce document decrit uniquement ce qui est effectivement implemente dans le depot.
+Ce document decrit uniquement ce qui est effectivement implemente et valide dans le depot.
 
 ## 1. Monorepo et outillage
 
 - npm workspaces declares en racine:
   - `frontend`
   - `backend`
-  - `tests/e2e` (absent actuellement)
-- TypeScript base shared: `tsconfig.base.json`
-- Aucun depot git initialise localement au moment de la documentation.
+  - `tests/e2e`
+- Configuration TypeScript partagee: `tsconfig.base.json`
+- Script perf racine execute k6 via Docker (pas besoin de binaire k6 local):
+  - `npm run test:perf`
+- A la date de validation, le dossier est utilise hors git local.
 
 ## 2. Backend (Express + TypeScript + PostgreSQL)
 
@@ -21,6 +23,7 @@ Ce document decrit uniquement ce qui est effectivement implemente dans le depot.
 - Connexion DB: `backend/src/db/pool.ts`
 - Initialisation schema au demarrage: `ensureDatabaseReady()`
 - Seed optionnel au demarrage si `SEED_ON_STARTUP=true`
+- Endpoint test reset: `POST /api/test/reset` (si `ENABLE_TEST_RESET=true`)
 
 ## 2.2 Schema SQL
 
@@ -34,9 +37,9 @@ Tables:
 - `treatments` (FK `parcel_id`, FK optionnelle `planting_id`)
 
 Caracteristiques:
-- contraintes de surface `> 0`
-- indexes sur colonnes de jointure
-- seed demo idempotent via `TRUNCATE ... RESTART IDENTITY`
+- contraintes surface `> 0`
+- index sur colonnes de jointure
+- reset+seed idempotent via `TRUNCATE ... RESTART IDENTITY`
 
 ## 2.3 Architecture applicative
 
@@ -64,22 +67,16 @@ Regles metier notables:
 - `GET /api/treatments/parcel/:parcelId`
 - `POST /api/treatments`
 - `DELETE /api/treatments/:id`
-- `POST /api/test/reset` (actif uniquement si `ENABLE_TEST_RESET=true`)
+- `POST /api/test/reset`
 
-## 2.5 Gestion d'erreurs
-
-Middleware central dans `backend/src/app.ts`:
-- `DomainError` -> status embarque
-- `ZodError` -> `400 Payload invalide`
-- fallback -> `500 Erreur interne`
-
-## 2.6 Tests backend
+## 2.5 Tests backend
 
 - Outil: Jest + ts-jest
 - Fichiers:
   - `backend/tests/parcel.service.spec.ts`
   - `backend/tests/planting.service.spec.ts`
-- Pas de test repository ni integration HTTP actuellement.
+- Couche couverte: services metier (tests unitaires)
+- Pas de tests HTTP d'integration a ce stade
 
 ## 3. Frontend (Angular 19 standalone + Vite)
 
@@ -107,30 +104,66 @@ Middleware central dans `backend/src/app.ts`:
 - Base URL:
   - `import.meta.env.VITE_API_URL`
   - fallback `http://localhost:3000/api`
-- Modeles TypeScript partages au front:
+- Modeles TypeScript:
   - `Parcel`, `Planting`, `Treatment`, `ParcelDetails`
 
 ## 3.4 Tests frontend
 
-- Vitest est configure (`vite.config.ts`)
-- setup jsdom present (`src/test-setup.ts`)
-- aucun spec `*.spec.ts` present actuellement
+- Outil: Vitest (jsdom)
+- Fichier:
+  - `frontend/src/app/api.service.spec.ts`
+- Nature des tests:
+  - appels HTTP mockes (pas d'appel API reel)
 
-## 4. Gaps par rapport au plan initial
+## 4. E2E et performance
 
-Non implementes a date:
-- dossier `tests/e2e` (Playwright/Cucumber)
-- dossier `tests/perf` et scripts k6
-- Dockerfiles + `docker-compose.yml`
-- docs de demo/troubleshooting initialement prevus
+## 4.1 E2E (Cucumber + Playwright)
 
-## 5. Contrat de reconstruction
+- Dossier present: `tests/e2e`
+- Feature metier: `tests/e2e/features/parcels.feature`
+- Steps: `tests/e2e/steps/parcels.steps.ts`
+- World Playwright: `tests/e2e/support/world.ts`
+- Browser Chromium Playwright requis sur machine locale (`npx playwright install chromium`)
+- Validation realisee: 2 scenarios / 11 steps passes sur stack reelle dockerisee
 
-Pour reconstruire un clone fonctionnel du depot actuel, respecter:
-1. meme architecture de dossiers
-2. memes scripts npm en racine et par workspace
-3. meme schema SQL et seed
-4. memes endpoints REST
-5. meme comportement front (listes + formulaires)
-6. meme couverture de tests existants (au minimum les 2 specs backend)
+## 4.2 Performance (k6)
 
+- Script present: `tests/perf/api-load.js`
+- Scenarios:
+  - `normal_load` (constant-vus)
+  - `spike_load` (ramping-vus)
+- Seuils:
+  - `http_req_failed < 2%`
+  - `http_req_duration p95 < 500ms`
+- Validation realisee via conteneur `grafana/k6` avec seuils respectes
+
+## 5. Dockerisation
+
+Fichiers:
+- `docker-compose.yml`
+- `backend/Dockerfile`
+- `frontend/Dockerfile`
+- `tests/e2e/Dockerfile`
+- `.dockerignore`
+
+Statut:
+- `docker compose up --build -d` valide (db + backend + frontend up, backend healthy)
+- front accessible sur `http://localhost:4200`
+- backend health OK sur `http://localhost:3000/health`
+
+## 6. Ecarts cible planifiee vs etat reel
+
+Par rapport au plan initial:
+- Cible front tests: composants + services mockes
+- Etat reel valide: tests de service API mocke, pas encore de specs composants dans l'etat courant
+- Cible gates CI completes: non configurees ici (execution locale manuelle validee)
+- Cible perf locale via k6 natif: remplacee par execution Docker pour portabilite
+
+## 7. Contrat de reconstruction
+
+Pour reconstruire un clone fonctionnel equivalent:
+1. conserver l'architecture monorepo et scripts npm
+2. conserver schema+seed SQL
+3. conserver endpoints REST et regles de services
+4. conserver stack Docker et healthchecks
+5. conserver separation des niveaux de test (frontend mocke, E2E reel, perf k6)

@@ -44,6 +44,13 @@ Garantir la qualite de l'application agricole avec une separation stricte des ni
   - creation parcelle
   - ajout plantation + traitement
 
+## Etat reel actuellement implemente
+
+- Backend unit (Jest): 2 specs services (`parcel.service`, `planting.service`)
+- Frontend unit/integration mockes (Vitest): 1 spec service API mockee (`api.service.spec.ts`)
+- E2E BDD (Cucumber + Playwright): 2 scenarios metier valides sur stack reelle
+- Performance (k6): scenario nominal + spike avec seuils passes (`p95 < 500ms`, `taux erreur < 2%`)
+
 ## Quality gates proposes (CI)
 
 1. `npm run test:unit:backend`
@@ -60,9 +67,11 @@ Pipeline implemente:
   - `npm run build`
 - Job E2E dockerise sur `push` vers `main`:
   - `docker compose --profile tests up --build --abort-on-container-exit --exit-code-from e2e e2e`
+  - artefact publie: `e2e-docker-logs`
 - Workflow nightly k6:
   - `.github/workflows/perf-nightly.yml`
   - execution via cron + declenchement manuel
+  - artefact publie: `k6-summary.json`
 
 En cas d'echec d'un gate, le pipeline est rouge.
 

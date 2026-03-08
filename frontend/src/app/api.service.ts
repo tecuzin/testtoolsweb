@@ -14,8 +14,16 @@ export class ApiService {
     return this.http.get<Parcel[]>(`${this.baseUrl}/parcels`);
   }
 
+  getParcels(): Observable<Parcel[]> {
+    return this.listParcels();
+  }
+
   getParcelDetails(id: number): Observable<ParcelDetails> {
     return this.http.get<ParcelDetails>(`${this.baseUrl}/parcels/${id}`);
+  }
+
+  getParcel(id: number): Observable<ParcelDetails> {
+    return this.getParcelDetails(id);
   }
 
   createParcel(payload: {

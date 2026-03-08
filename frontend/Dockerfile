@@ -1,14 +1,8 @@
-FROM node:22-alpine AS deps
-WORKDIR /app
-COPY package.json tsconfig.base.json ./
-COPY frontend/package.json ./frontend/package.json
-RUN npm install --workspaces
-
 FROM node:22-alpine AS build
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/frontend/node_modules ./frontend/node_modules
-COPY package.json tsconfig.base.json ./
+COPY package.json package-lock.json tsconfig.base.json ./
+COPY frontend/package.json ./frontend/package.json
+RUN npm ci --workspace frontend
 COPY frontend ./frontend
 RUN npm run build --workspace frontend
 

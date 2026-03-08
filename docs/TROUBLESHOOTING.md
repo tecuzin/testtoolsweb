@@ -13,6 +13,8 @@
 - Verifier logs backend: `docker compose logs backend`
 - Verifier la DB: `docker compose logs db`
 - Verifier `DATABASE_URL` dans compose
+- Rebuild complet si besoin:
+  - `docker compose up --build -d`
 
 ### Reinitialiser completement l'environnement
 
@@ -39,6 +41,12 @@ docker compose up --build
 - Verifier que backend expose `POST /api/test/reset`.
 - Verifier `ENABLE_TEST_RESET=true`.
 - Verifier URL `API_URL` dans les variables e2e.
+- Verifier que la stack est demarree avant `npm run test:e2e`.
+
+### Chromium Playwright manquant
+
+- Installer le navigateur:
+  - `npx playwright install chromium`
 
 ### E2E flaky
 
@@ -53,3 +61,8 @@ docker compose up --build
 - Verifier charge machine locale.
 - Verifier que la base n'est pas saturee.
 - Rejouer avec moins de VUs pour calibrer la baseline.
+
+### `k6: command not found`
+
+- Utiliser `npm run test:perf` (execution k6 via Docker).
+- Verifier que Docker est demarre.

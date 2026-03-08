@@ -11,27 +11,55 @@ import { Parcel } from './models';
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
     <section class="card">
-      <h2>Ajouter une parcelle</h2>
+      <div class="section-top">
+        <h2>Ajouter une parcelle</h2>
+        <span class="kpi">Etape 1</span>
+      </div>
+      <p class="muted">
+        Commencez ici pour creer une nouvelle parcelle avec sa surface et sa localisation.
+      </p>
       <form [formGroup]="form" (ngSubmit)="create()" data-testid="parcel-create-form">
-        <label for="name">Nom</label>
-        <input id="name" formControlName="name" data-testid="parcel-name-input" />
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="name">Nom de la parcelle</label>
+            <input id="name" formControlName="name" data-testid="parcel-name-input" />
+            <small class="help-text">Exemple: Parcelle Nord</small>
+          </div>
 
-        <label for="area">Surface (ha)</label>
-        <input id="area" type="number" formControlName="areaHectares" data-testid="parcel-area-input" />
+          <div class="form-group">
+            <label for="area">Surface (ha)</label>
+            <input id="area" type="number" formControlName="areaHectares" data-testid="parcel-area-input" />
+            <small class="help-text">Minimum 0,1 hectare</small>
+          </div>
 
-        <label for="location">Localisation</label>
-        <input id="location" formControlName="location" data-testid="parcel-location-input" />
+          <div class="form-group">
+            <label for="location">Localisation</label>
+            <input id="location" formControlName="location" data-testid="parcel-location-input" />
+            <small class="help-text">Commune ou zone de culture</small>
+          </div>
+        </div>
 
-        <button type="submit" [disabled]="form.invalid" data-testid="parcel-submit-btn">Créer la parcelle</button>
+        <div class="button-row">
+          <button type="submit" [disabled]="form.invalid" data-testid="parcel-submit-btn">Creer la parcelle</button>
+        </div>
       </form>
     </section>
 
     <section class="card">
-      <h2>Parcelles</h2>
-      <ul>
-        <li *ngFor="let parcel of parcels" data-testid="parcel-item">
-          <a [routerLink]="['/parcels', parcel.id]">{{ parcel.name }}</a>
-          <small> - {{ parcel.areaHectares }} ha ({{ parcel.location }})</small>
+      <div class="section-top">
+        <h2>Parcelles</h2>
+        <span class="kpi">{{ parcels.length }} total</span>
+      </div>
+      <p class="muted">Selectionnez une parcelle pour voir son detail et ajouter des operations.</p>
+
+      <p class="empty-state" *ngIf="parcels.length === 0">
+        Aucune parcelle enregistree pour le moment.
+      </p>
+
+      <ul class="list-clean" *ngIf="parcels.length > 0">
+        <li class="list-item" *ngFor="let parcel of parcels" data-testid="parcel-item">
+          <a class="parcel-name" [routerLink]="['/parcels', parcel.id]">{{ parcel.name }}</a>
+          <small class="muted">{{ parcel.areaHectares }} ha - {{ parcel.location }}</small>
         </li>
       </ul>
     </section>

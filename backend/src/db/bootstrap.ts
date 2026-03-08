@@ -7,7 +7,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 async function runSqlFile(filename: string) {
-  const content = await fs.readFile(path.join(__dirname, filename), 'utf8');
+  const primaryPath = path.join(__dirname, filename);
+  const fallbackPath = path.join(__dirname, '../../src/db', filename);
+  let content: string;
+
+  try {
+    content = await fs.readFile(primaryPath, 'utf8');
+  } catch {
+    content = await fs.readFile(fallbackPath, 'utf8');
+  }
+
   await pool.query(content);
 }
 
