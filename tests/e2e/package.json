@@ -3,13 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "cucumber-js",
-    "test:headed": "PWDEBUG=1 cucumber-js",
-    "test:report": "cucumber-js --format progress --format summary --format json:../../reports/e2e/cucumber-report.json"
+    "test": "NODE_OPTIONS=--import=tsx cucumber-js",
+    "test:headed": "PWDEBUG=1 NODE_OPTIONS=--import=tsx cucumber-js",
+    "test:report": "NODE_OPTIONS=--import=tsx cucumber-js --format progress --format summary --format json:../../reports/e2e/cucumber-report.json"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^11.0.1",
     "@playwright/test": "^1.48.0",
+    "tsx": "^4.20.6",
     "typescript": "^5.6.2"
   }
 }

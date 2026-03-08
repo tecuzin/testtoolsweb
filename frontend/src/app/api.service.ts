@@ -6,7 +6,7 @@ import { Parcel, ParcelDetails, Planting, Treatment } from './models';
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly baseUrl =
-    import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
+    import.meta.env.VITE_API_URL ?? '/api';
 
   constructor(private readonly http: HttpClient) {}
 

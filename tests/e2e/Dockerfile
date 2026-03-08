@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright:v1.48.2-jammy
+FROM mcr.microsoft.com/playwright:v1.58.2-jammy
 WORKDIR /app
 COPY package.json package-lock.json tsconfig.base.json ./
 COPY tests/e2e/package.json ./tests/e2e/package.json
