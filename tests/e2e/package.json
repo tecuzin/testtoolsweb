@@ -1,0 +1,14 @@
+{
+  "name": "tests-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "cucumber-js",
+    "test:headed": "PWDEBUG=1 cucumber-js"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^11.0.1",
+    "@playwright/test": "^1.48.0",
+    "typescript": "^5.6.2"
+  }
+}

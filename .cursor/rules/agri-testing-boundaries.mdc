@@ -1,0 +1,13 @@
+---
+description: Frontieres de tests et non-regression de la strategie
+alwaysApply: true
+---
+
+# Testing boundaries
+
+- Les tests frontend restent mockes (pas de dependance API/DB reelles).
+- Les tests backend unitaires isolent la couche service/repository via mocks.
+- Ne pas annoncer E2E/perf comme "faits" tant que les dossiers/fichiers n'existent pas.
+- Toute nouvelle suite doit indiquer son niveau: unit, integration, e2e, perf.
+- Avant de conclure, comparer l'implementation avec `STRATEGY.md`.
+

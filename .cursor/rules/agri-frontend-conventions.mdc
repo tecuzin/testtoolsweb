@@ -1,0 +1,16 @@
+---
+description: Conventions frontend Angular standalone et service API
+globs: frontend/src/**/*.ts
+alwaysApply: false
+---
+
+# Frontend conventions
+
+- Utiliser des composants standalone Angular.
+- Centraliser les appels HTTP dans `ApiService`.
+- Garder les modeles partages dans `frontend/src/app/models.ts`.
+- Conserver les formulaires reactifs avec validations minimales.
+- Utiliser `data-testid` sur les elements cles de formulaire/liste.
+- Ne pas hardcoder d'URL API hors `ApiService`.
+- Respecter le routage: liste sur `/`, detail sur `/parcels/:id`.
+

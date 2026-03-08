@@ -1,0 +1,16 @@
+---
+description: Conventions backend Express TypeScript PostgreSQL
+globs: backend/**/*.ts
+alwaysApply: false
+---
+
+# Backend conventions
+
+- Respecter la separation `routes -> services -> repositories`.
+- Mettre les validations de payload dans les services avec Zod.
+- Lever des `DomainError` pour les erreurs metier attendues.
+- Garder les repositories focalises SQL/mapping seulement.
+- Conserver les mappings DB `snake_case` vers domaines TypeScript `camelCase`.
+- Ne pas contourner la couche service depuis les routes.
+- Toute nouvelle route doit etre prefixee via `app.ts` sous `/api`.
+

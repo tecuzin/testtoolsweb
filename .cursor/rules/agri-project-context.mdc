@@ -1,0 +1,14 @@
+---
+description: Contexte projet et objectif de parite implementation
+alwaysApply: true
+---
+
+# Contexte projet Agri Demo
+
+- Le but est de reproduire l'etat reel implemente, pas le plan ideal complet.
+- Stack actuelle: backend Express TypeScript + PostgreSQL, frontend Angular 19 standalone + Vite.
+- Les volets E2E, performance et Docker ne sont pas implementes.
+- Toute tache doit mentionner les ecarts entre cible planifiee et etat reel.
+- Toujours privilegier des modifications minimales et coherentes avec l'architecture existante.
+- Avant toute refonte, lire `docs/IMPLEMENTATION_STATE.md`.
+

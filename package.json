@@ -1,0 +1,28 @@
+{
+  "name": "agri-testtools-demo",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "tests/e2e"
+  ],
+  "scripts": {
+    "install:all": "npm install --workspaces",
+    "dev": "npm run dev --workspace backend",
+    "dev:frontend": "npm run dev --workspace frontend",
+    "dev:backend": "npm run dev --workspace backend",
+    "build": "npm run build --workspace backend && npm run build --workspace frontend",
+    "build:backend": "npm run build --workspace backend",
+    "build:frontend": "npm run build --workspace frontend",
+    "test": "npm run test --workspace backend && npm run test --workspace frontend",
+    "test:unit:backend": "npm run test --workspace backend",
+    "test:unit:frontend": "npm run test --workspace frontend",
+    "test:e2e": "npm run test --workspace tests/e2e",
+    "test:perf": "k6 run tests/perf/api-load.js",
+    "lint": "npm run lint --workspace backend && npm run lint --workspace frontend",
+    "demo:stack:up": "docker compose up --build -d",
+    "demo:stack:down": "docker compose down",
+    "demo:test:all-local": "npm run test:unit:backend && npm run test:unit:frontend",
+    "ci": "npm run lint && npm run demo:test:all-local && npm run build"
+  }
+}
